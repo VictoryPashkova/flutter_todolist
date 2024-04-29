@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todolist/features/log_in/presentation/pages/log_in_page.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dart_style/dart_style.dart';
 import '../../../../presentation/ui/primary_botton/primary_button_text.dart';
 import '../pages/registration_success_page.dart';
+import '../../../log_in/presentation/pages/log_in_page.dart';
+import '../pages/registration_main_page.dart';
+import 'dart:convert';
 
 export 'register_form.dart';
 
@@ -51,22 +55,34 @@ class RegisterFormState extends State<RegisterForm> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     Map<String, dynamic> user = {
-      'userId': DateTime.now().millisecondsSinceEpoch.toString(),
+      'userId': DateTime.now().millisecondsSinceEpoch,
       'userName': _nameController.text,
       'userEmail': _emailController.text,
       'userPassword': _pass.text,
     };
 
-    List<Map<String, dynamic>> users =
-        (prefs.getStringList('users') ?? []).map((userJson) {
-      return Map<String, dynamic>.from(
-          Map<String, dynamic>.fromIterable(userJson.split(',')));
-    }).toList();
+    // Получение списка строк из SharedPreferences
+    List<String>? usersJsonList = prefs.getStringList('users');
 
+    // Создание списка пользователей типа List<Map<String, dynamic>>
+    List<Map<String, dynamic>> users = [];
+    if (usersJsonList != null) {
+      // Преобразование каждой строки JSON-представления пользователя в объект Map
+      users = usersJsonList
+          .map((userJson) => json.decode(userJson) as Map<String, dynamic>)
+          .toList();
+    }
+
+    // Добавление нового пользователя в список
     users.add(user);
 
-    await prefs.setStringList(
-        'users', users.map((user) => user.values.join(',')).toList());
+    // Преобразование списка пользователей в список JSON-строк
+    List<String> updatedUsersJsonList =
+        users.map((user) => json.encode(user)).toList();
+
+    // Сохранение списка JSON-строк в SharedPreferences
+    await prefs.setStringList('users', updatedUsersJsonList);
+    print(prefs.getStringList('users'));
 
     _nameController.clear();
     _emailController.clear();
@@ -142,6 +158,7 @@ class RegisterFormState extends State<RegisterForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextFormField(
+            controller: _nameController,
             decoration: InputDecoration(
               floatingLabelBehavior: FloatingLabelBehavior.always,
               contentPadding: EdgeInsets.fromLTRB(0, 12, 0, 12),
@@ -182,6 +199,7 @@ class RegisterFormState extends State<RegisterForm> {
           ),
           SizedBox(height: 28),
           TextFormField(
+            controller: _emailController,
             style: TextStyle(
               color: isEmailValid ? validInputColor : Color(0xFFC2534C),
             ),
@@ -239,10 +257,10 @@ class RegisterFormState extends State<RegisterForm> {
           ),
           SizedBox(height: 28),
           TextFormField(
+            controller: _pass,
             style: TextStyle(
               color: isPassValid ? validInputColor : Color(0xFFC2534C),
             ),
-            controller: _pass,
             obscureText: _isObscurePassword,
             textInputAction: TextInputAction.done,
             decoration: InputDecoration(
@@ -411,7 +429,12 @@ class RegisterFormState extends State<RegisterForm> {
                 ),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LogInMainPage()),
+                  );
+                },
                 child: Text(
                   'Log in',
                   style: TextStyle(
