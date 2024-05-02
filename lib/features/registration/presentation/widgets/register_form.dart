@@ -61,26 +61,20 @@ class RegisterFormState extends State<RegisterForm> {
       'userPassword': _pass.text,
     };
 
-    // Получение списка строк из SharedPreferences
     List<String>? usersJsonList = prefs.getStringList('users');
 
-    // Создание списка пользователей типа List<Map<String, dynamic>>
     List<Map<String, dynamic>> users = [];
     if (usersJsonList != null) {
-      // Преобразование каждой строки JSON-представления пользователя в объект Map
       users = usersJsonList
           .map((userJson) => json.decode(userJson) as Map<String, dynamic>)
           .toList();
     }
 
-    // Добавление нового пользователя в список
     users.add(user);
 
-    // Преобразование списка пользователей в список JSON-строк
     List<String> updatedUsersJsonList =
         users.map((user) => json.encode(user)).toList();
 
-    // Сохранение списка JSON-строк в SharedPreferences
     await prefs.setStringList('users', updatedUsersJsonList);
     print(prefs.getStringList('users'));
 

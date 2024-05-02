@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dart_style/dart_style.dart';
 import '../../../../presentation/ui/primary_botton/primary_button_text.dart';
+import '../../../user_dashboard/presentation/pages/user_dashboard_page.dart';
 
 class RegistrationSuccessScreen extends StatelessWidget {
   @override
@@ -39,7 +40,10 @@ class RegistrationSuccessScreen extends StatelessWidget {
             right: 24,
             child: ElevatedButton(
               onPressed: () {
-                print('Go to app link');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => UserDashboardPage()),
+                );
               },
               style: ButtonStyle(
                 padding: MaterialStateProperty.all(

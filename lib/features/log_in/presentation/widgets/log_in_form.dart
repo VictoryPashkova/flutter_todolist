@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dart_style/dart_style.dart';
 import '../../../../presentation/ui/primary_botton/primary_button_text.dart';
 import '../../../registration/presentation/pages/registration_main_page.dart';
+import '../../../user_dashboard/presentation/pages/user_dashboard_page.dart';
 import 'dart:convert';
 
 export 'log_in_form.dart';
@@ -234,7 +235,11 @@ class LogInFormState extends State<LogInForm> {
           ElevatedButton(
             onPressed: _isFormValid
                 ? () {
-                    _loginUser();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => UserDashboardPage()),
+                    );
                   }
                 : null,
             style: ButtonStyle(

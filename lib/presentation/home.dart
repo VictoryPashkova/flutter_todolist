@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dart_style/dart_style.dart';
 import '../features/registration/presentation/pages/registration_main_page.dart';
+import '../features/log_in/presentation/pages/log_in_page.dart';
 export 'home.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -15,7 +16,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return RegistrationMainPage();
+        return LogInMainPage();
       },
     );
   }
