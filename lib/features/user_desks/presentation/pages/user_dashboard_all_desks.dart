@@ -2,29 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_todolist/presentation/ui/primary_botton/exit_button.dart';
 import 'package:provider/provider.dart';
 import '../../../../internal/application.dart';
-import '../../../../presentation/ui/tab_bar/tab_bar_desk.dart';
-import '../../../../presentation/ui/desk_card/desk_item.dart';
 import '../../../../presentation/ui/modals/add_modal.dart';
+import '../../../../presentation/ui/desk_card/desk_item.dart';
+import '../../../../presentation/ui/tab_bar/tab_bar_desk.dart';
 
-export 'user_dashboard_page.dart';
+export 'user_dashboard_all_desks.dart';
 
-class UserDashboardPage extends StatefulWidget {
-  final int id;
-  final String itemName;
-  const UserDashboardPage({Key? key, required this.id, required this.itemName})
-      : super(key: key);
+class UserDashboardAllDesksPage extends StatefulWidget {
+  const UserDashboardAllDesksPage({Key? key}) : super(key: key);
 
   @override
-  UserDashboardPageState createState() => UserDashboardPageState();
+  UserDashboardAllDesksPageState createState() =>
+      UserDashboardAllDesksPageState();
 }
 
-class UserDashboardPageState extends State<UserDashboardPage> {
-  late String deskTitle;
-
+class UserDashboardAllDesksPageState extends State<UserDashboardAllDesksPage> {
   @override
   void initState() {
     super.initState();
-    deskTitle = '${widget.itemName}\'s desk columns';
   }
 
   Future<void> _dialogBuilder(BuildContext context) async {
@@ -40,8 +35,9 @@ class UserDashboardPageState extends State<UserDashboardPage> {
   Widget build(BuildContext context) {
     return Consumer<MyAppState>(
       builder: (context, myAppState, _) {
-        List<Map<String, dynamic>> columns = myAppState.getCurrentDeskColumns();
-
+        String userName = myAppState.currentUserName;
+        String deskTitle = '$userName\'s all desks';
+        List<Map<String, dynamic>> desks = myAppState.getCurrentUserDesks();
         return Scaffold(
           body: Stack(
             children: [
@@ -89,7 +85,7 @@ class UserDashboardPageState extends State<UserDashboardPage> {
                   ),
                 ),
               ),
-              if (columns.isNotEmpty)
+              if (desks.isNotEmpty)
                 Positioned(
                   top: 134,
                   left: 24,
@@ -110,11 +106,11 @@ class UserDashboardPageState extends State<UserDashboardPage> {
                           child: SingleChildScrollView(
                             child: Column(
                               children: [
-                                ...(columns
-                                    .map((column) => [
+                                ...(desks
+                                    .map((desk) => [
                                           DeskItem(
-                                              id: column['id'],
-                                              itemName: column['name']),
+                                              id: desk['id'],
+                                              itemName: desk['name']),
                                           SizedBox(height: 12),
                                         ])
                                     .expand((widget) => widget)
@@ -127,7 +123,7 @@ class UserDashboardPageState extends State<UserDashboardPage> {
                     ),
                   ),
                 ),
-              if (columns.isEmpty)
+              if (desks.isEmpty)
                 Positioned(
                   top: 341,
                   left: 0,
@@ -144,7 +140,7 @@ class UserDashboardPageState extends State<UserDashboardPage> {
                         ),
                         SizedBox(height: 20),
                         Text(
-                          "You haven't created any column",
+                          "You haven't created any desk yet",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: 'Outfit',
@@ -157,7 +153,7 @@ class UserDashboardPageState extends State<UserDashboardPage> {
                     ),
                   ),
                 ),
-              if (columns.isEmpty)
+              if (desks.isEmpty)
                 Positioned(
                   top: 593,
                   left: 250,

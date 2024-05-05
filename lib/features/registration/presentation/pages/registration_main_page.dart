@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dart_style/dart_style.dart';
-import '../widgets/register_img_cover.dart';
 import '../widgets/register_form.dart';
 export 'registration_main_page.dart';
 

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dart_style/dart_style.dart';
 import '../../../../presentation/ui/primary_botton/primary_button_text.dart';
-import '../../../user_dashboard/presentation/pages/user_dashboard_page.dart';
+import '../../../user_desks/presentation/pages/user_dashboard_all_desks.dart';
 
 class RegistrationSuccessScreen extends StatelessWidget {
   @override
@@ -42,7 +39,8 @@ class RegistrationSuccessScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => UserDashboardPage()),
+                  MaterialPageRoute(
+                      builder: (context) => UserDashboardAllDesksPage()),
                 );
               },
               style: ButtonStyle(

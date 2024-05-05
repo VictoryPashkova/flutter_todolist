@@ -1,65 +1,55 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_todolist/presentation/ui/primary_botton/exit_button.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dart_style/dart_style.dart';
 import '../../../../presentation/ui/primary_botton/primary_button_text.dart';
-import 'dart:convert';
+import '../../../../internal/application.dart';
 
-export 'title_form.dart';
+export 'add_title_form.dart';
 
-class DeskForm extends StatefulWidget {
-  const DeskForm({super.key});
+class AddItemForm extends StatefulWidget {
+  const AddItemForm({super.key});
 
   @override
-  DeskFormState createState() {
-    return DeskFormState();
+  AddItemFormState createState() {
+    return AddItemFormState();
   }
 }
 
-class DeskFormState extends State<DeskForm> {
+class AddItemFormState extends State<AddItemForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _textFieldController = TextEditingController();
   bool _isFormValid = false;
 
-  void _AddColumn() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final currentUserJson = prefs.getString('currentUser') ?? '';
+  void _addColumn(BuildContext context) async {
+    final id = DateTime.now().millisecondsSinceEpoch;
+    final columnName = _textFieldController.text;
 
-    Map<String, dynamic> currentUser =
-        json.decode(currentUserJson) as Map<String, dynamic>;
-    final currentUserId = currentUser['userId'];
-
-    Map<String, dynamic> column = {
-      'columnId': DateTime.now().millisecondsSinceEpoch,
-      'columnName': _textFieldController.text,
-      'userId': currentUserId,
-    };
-
-    List<String>? columnsJsonList = prefs.getStringList('columns');
-
-    List<Map<String, dynamic>> columns = [];
-    if (columnsJsonList != null) {
-      columns = columnsJsonList
-          .map((columnJson) => json.decode(columnJson) as Map<String, dynamic>)
-          .toList();
-    }
-
-    columns.add(column);
-
-    List<String> updatedColumnsJsonList =
-        columns.map((column) => json.encode(column)).toList();
-
-    // Сохранение списка JSON-строк в SharedPreferences
-    await prefs.setStringList('columns', updatedColumnsJsonList);
-    print(prefs.getStringList('columns'));
+    final myAppState = Provider.of<MyAppState>(context, listen: false);
+    final deskId = myAppState.currentDeskId;
+    await myAppState.addColumn(columnName, id, deskId);
 
     _textFieldController.clear();
-    Navigator.of(context).pop();
+  }
+
+  void _addDesk(BuildContext context) async {
+    final id = DateTime.now().millisecondsSinceEpoch;
+    final deskName = _textFieldController.text;
+
+    final myAppState = Provider.of<MyAppState>(context, listen: false);
+    await myAppState.addDesk(deskName, id);
+
+    _textFieldController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
+    MyAppState myAppState = Provider.of<MyAppState>(context);
+    int currentPageIndex = myAppState.currentPageIndex;
+    String hintText = currentPageIndex == 1
+        ? 'Enter desk name'
+        : currentPageIndex == 2
+            ? 'Enter column name'
+            : '';
+
     return Form(
       key: _formKey,
       child: Column(
@@ -82,7 +72,7 @@ class DeskFormState extends State<DeskForm> {
               focusedErrorBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Color(0xFFC2534C), width: 1.0),
               ),
-              hintText: 'Enter titile of column',
+              hintText: hintText,
               hintStyle: TextStyle(
                 color: Color(0xFFCFCFCF),
                 fontSize: 16,
@@ -103,7 +93,13 @@ class DeskFormState extends State<DeskForm> {
           ElevatedButton(
             onPressed: _isFormValid
                 ? () {
-                    _AddColumn();
+                    if (currentPageIndex == 1) {
+                      _addDesk(context);
+                      Navigator.of(context).pop();
+                    } else if (currentPageIndex == 2) {
+                      _addColumn(context);
+                      Navigator.of(context).pop();
+                    }
                   }
                 : null,
             style: ButtonStyle(

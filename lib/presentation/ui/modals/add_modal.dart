@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
-import '../widgits/title_form.dart';
+import '../forms/add_title_form.dart';
+import 'package:provider/provider.dart';
+import '../../../internal/application.dart';
 
-export 'add_column_modal.dart';
+export 'add_modal.dart';
 
-class AddColumnModal extends StatelessWidget {
-  const AddColumnModal({
+class AddModal extends StatelessWidget {
+  const AddModal({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+    MyAppState myAppState = Provider.of<MyAppState>(context);
+    int currentPageIndex = myAppState.currentPageIndex;
+    String title = currentPageIndex == 1
+        ? 'New desk'
+        : currentPageIndex == 2
+            ? 'New column'
+            : '';
+
     return AlertDialog(
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
@@ -30,7 +40,7 @@ class AddColumnModal extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(
-                  'New column',
+                  title,
                   style: TextStyle(
                     fontFamily: 'Outfit',
                     fontWeight: FontWeight.w600,
@@ -60,7 +70,7 @@ class AddColumnModal extends StatelessWidget {
               ],
             ),
             SizedBox(height: 28),
-            DeskForm(),
+            AddItemForm(),
           ],
         ),
       ),

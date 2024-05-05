@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todolist/features/log_in/presentation/pages/log_in_page.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dart_style/dart_style.dart';
 import '../../../../presentation/ui/primary_botton/primary_button_text.dart';
 import '../pages/registration_success_page.dart';
-import '../../../log_in/presentation/pages/log_in_page.dart';
-import '../pages/registration_main_page.dart';
 import 'dart:convert';
 
 export 'register_form.dart';
@@ -61,14 +57,14 @@ class RegisterFormState extends State<RegisterForm> {
       'userPassword': _pass.text,
     };
 
-    List<String>? usersJsonList = prefs.getStringList('users');
+    List<String> usersJsonList = prefs.getStringList('users') ?? [];
 
     List<Map<String, dynamic>> users = [];
-    if (usersJsonList != null) {
-      users = usersJsonList
-          .map((userJson) => json.decode(userJson) as Map<String, dynamic>)
-          .toList();
-    }
+    users = usersJsonList
+        .map((userJson) => json.decode(userJson) as Map<String, dynamic>)
+        .toList();
+
+    prefs.setString('currentUser', json.encode(user));
 
     users.add(user);
 
@@ -76,17 +72,11 @@ class RegisterFormState extends State<RegisterForm> {
         users.map((user) => json.encode(user)).toList();
 
     await prefs.setStringList('users', updatedUsersJsonList);
-    print(prefs.getStringList('users'));
 
     _nameController.clear();
     _emailController.clear();
     _pass.clear();
     _confirmPass.clear();
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => RegistrationSuccessScreen()),
-    );
   }
 
   bool _isObscurePassword = true;
@@ -389,6 +379,11 @@ class RegisterFormState extends State<RegisterForm> {
             onPressed: _isFormValid
                 ? () {
                     _registerUser();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RegistrationSuccessScreen()),
+                    );
                   }
                 : null,
             style: ButtonStyle(
