@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-import '../../home.dart';
-
-export 'exit_button.dart';
+import 'package:flutter_todolist/features/log_in/presentation/pages/log_in_page.dart';
 
 class ExitButton extends StatelessWidget {
+  const ExitButton({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MyHomePage()),
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const LogInMainPage(),
+          ),
         );
       },
       child: Container(
-        width: 42,
-        height: 42,
-        margin: EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(30),
@@ -27,7 +25,7 @@ class ExitButton extends StatelessWidget {
             ),
           ],
         ),
-        child: Icon(Icons.exit_to_app, size: 18),
+        child: const Icon(Icons.exit_to_app, size: 18),
       ),
     );
   }

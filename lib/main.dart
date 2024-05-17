@@ -6,7 +6,7 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => MyAppState(),
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }

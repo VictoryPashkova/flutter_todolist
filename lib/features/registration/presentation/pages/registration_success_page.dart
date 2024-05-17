@@ -1,63 +1,54 @@
 import 'package:flutter/material.dart';
-import '../../../../presentation/ui/primary_botton/primary_button_text.dart';
-import '../../../user_desks/presentation/pages/user_dashboard_all_desks.dart';
+import '../../../user_desks/presentation/pages/main_dashboard_page.dart';
+import '../../../../presentation/ui/bottons/primary_button.dart';
 
 class RegistrationSuccessScreen extends StatelessWidget {
+  const RegistrationSuccessScreen({super.key});
+
+  static const String registrationSuccessImgPath =
+      'assets/images/RegistrationSuccessImg.png';
+
+  void _onPressed(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const UserDashboardPage(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        alignment: Alignment.topCenter,
-        children: [
-          Positioned(
-            top: 236,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/images/RegistrationSuccessImg.png',
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'You have been registered!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: 'Outfit',
-                  ),
-                ),
-              ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              registrationSuccessImgPath,
             ),
-          ),
-          Positioned(
-            bottom: 128,
-            left: 24,
-            right: 24,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => UserDashboardAllDesksPage()),
-                );
-              },
-              style: ButtonStyle(
-                padding: MaterialStateProperty.all(
-                    EdgeInsets.fromLTRB(12, 16, 12, 16)),
-                minimumSize: MaterialStateProperty.all(Size(375, 54)),
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                ),
-                backgroundColor: MaterialStateProperty.all(Color(0xFF2A2A2A)),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+            const Text(
+              'You have been registered!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Outfit',
               ),
-              child: PrimaryButtonText(text: 'Get started'),
             ),
-          ),
-        ],
+            SizedBox(
+                height: MediaQuery.of(context).size.height *
+                    0.02),
+            FractionallySizedBox(
+              widthFactor: 0.8,
+              child: PrimaryButton(
+                btnText: 'Get started',
+                onPressed: () => _onPressed(context),
+                isValid: true,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

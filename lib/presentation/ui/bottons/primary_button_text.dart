@@ -14,10 +14,9 @@ class PrimaryButtonText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w500,
-        fontFamily: 'Outfit',
         color: Colors.white,
       ),
     );

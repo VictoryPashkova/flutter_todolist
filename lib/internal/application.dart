@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../presentation/home.dart';
-export 'application.dart';
+import '../themes/bottom_navigation_bar_theme.dart';
+import '../themes/dialog_theme.dart';
+import '../themes/elevated_button_theme.dart';
+import '../themes/floating_action_button_theme.dart';
+import '../themes/input_decoration_theme.dart';
 import 'dart:convert';
 
 class MyApp extends StatelessWidget {
@@ -18,8 +22,16 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
           fontFamily: 'Outfit',
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          inputDecorationTheme: AppInputDecorationTheme.defaultTheme,
+          dialogTheme: AppDialogTheme.defaultTheme,
+          elevatedButtonTheme: AppElevatedButtonTheme.defaultTheme,
+          floatingActionButtonTheme:
+              AppFloatingActionButtonTheme.defaultTheme,
+          bottomNavigationBarTheme:
+              AppBottomNavigationBarTheme.defaultTheme,
         ),
-        home: MyHomePage(),
+        home: const MyHomePage(),
       ),
     );
   }
@@ -30,11 +42,11 @@ class MyAppState extends ChangeNotifier {
   List<Map<String, dynamic>> get columns => _columns;
   List<Map<String, dynamic>> _desks = [];
   List<Map<String, dynamic>> get desks => _desks;
-  List<Map<String, dynamic>> _users = [];
+  final List<Map<String, dynamic>> _users = [];
   List<Map<String, dynamic>> get users => _users;
 
   int currentUserId = 1;
-  int currentPageIndex = 1;
+  int currentPageIndex = 0;
   int currentDeskId = 1;
   String currentDeskName = '';
   String currentUserName = '';

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todolist/features/log_in/presentation/pages/log_in_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../presentation/ui/primary_botton/primary_button_text.dart';
 import '../pages/registration_success_page.dart';
+import '../../../../presentation/ui/bottons/primary_button.dart';
 import 'dart:convert';
-
-export 'register_form.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -18,22 +16,23 @@ class RegisterForm extends StatefulWidget {
 
 class RegisterFormState extends State<RegisterForm> {
   final _formKey = GlobalKey<FormState>();
-  bool _isFormValid = false;
   final TextEditingController _pass = TextEditingController();
   final TextEditingController _confirmPass = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
-  bool isEmailValid = false;
-  Color inputTextColor = Color(0xFF2A2A2A);
-  Color validInputColor = Color(0xFF39C622);
-  Color inputBorderColor = Color(0xFFCFCFCF);
-  bool isConfirmPassValid = false;
-  Color obscureIconColor = Color(0xFF2A2A2A);
-  bool isPassValid = false;
-  Color focusedBorderColor = Color(0xFF2A2A2A);
-  Color enabledBorderColor = Color(0xFFCFCFCF);
-  Color errorBorderColor = Color(0xFFC2534C);
+  static const Color errorColor = Color(0xFFC2534C);
+  static const Color hightLightColor = Color(0xFFDE6352);
+  static const Color enabledColor = Color(0xFFCFCFCF);
+  static const Color focusedColor = Color(0xFF2A2A2A);
+  static const Color succeededColor = Color(0xFF39C622);
+  static const Color secondatyTextColor = Color(0xFF696969);
+  static const Color enabledBtnColor = Color(0xFFEBEBEB);
+
+  bool _isFormValid = false;
+  bool _isEmailValid = false;
+  bool _isPassValid = false;
+  bool _isConfirmPassValid = false;
 
   void _validateForm() {
     if (_formKey.currentState!.validate()) {
@@ -94,48 +93,57 @@ class RegisterFormState extends State<RegisterForm> {
     });
   }
 
+  String? validateEmail(String? value) {
+    const pattern = r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'"
+        r'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-'
+        r'\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*'
+        r'[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4]'
+        r'[0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9]'
+        r'[0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\'
+        r'x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])';
+    final regex = RegExp(pattern);
+
+    if (value == null || value.isEmpty) {
+      return 'Please enter some text';
+    }
+
+    return !regex.hasMatch(value) ? 'Enter correct e-mail' : null;
+  }
+
+  String? validateConfirmPass(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter some text';
+    }
+    if (value.length < 5 && value == _pass.text) {
+      return 'Password field must be at least 5 characters';
+    }
+    if (value != _pass.text) {
+      return 'Passwords must match';
+    }
+    return null;
+  }
+
+  String? validatePass(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter password';
+    }
+    if (value.length < 5) {
+      return 'Password must be at least 5 characters';
+    }
+    return null;
+  }
+
+  void _onPressed() {
+    _registerUser();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const RegistrationSuccessScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    String? validateEmail(String? value) {
-      const pattern = r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'"
-          r'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-'
-          r'\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*'
-          r'[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4]'
-          r'[0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9]'
-          r'[0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\'
-          r'x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])';
-      final regex = RegExp(pattern);
-
-      if (value == null || value.isEmpty) {
-        return 'Please enter some text';
-      }
-
-      return !regex.hasMatch(value) ? 'Enter correct e-mail' : null;
-    }
-
-    String? validateConfirmPass(String? value) {
-      if (value == null || value.isEmpty) {
-        return 'Please enter some text';
-      }
-      if (value.length < 5 && value == _pass.text) {
-        return 'Password field must be at least 5 characters';
-      }
-      if (value != _pass.text) {
-        return 'Passwords must match';
-      }
-      return null;
-    }
-
-    String? validatePass(String? value) {
-      if (value == null || value.isEmpty) {
-        return 'Please enter password';
-      }
-      if (value.length < 5) {
-        return 'Password must be at least 5 characters';
-      }
-      return null;
-    }
-
     return Form(
       key: _formKey,
       child: Column(
@@ -143,33 +151,9 @@ class RegisterFormState extends State<RegisterForm> {
         children: [
           TextFormField(
             controller: _nameController,
-            decoration: InputDecoration(
-              floatingLabelBehavior: FloatingLabelBehavior.always,
-              contentPadding: EdgeInsets.fromLTRB(0, 12, 0, 12),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFF2A2A2A), width: 1.0),
-              ),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFCFCFCF), width: 1.0),
-              ),
-              errorBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFC2534C), width: 1.0),
-              ),
-              focusedErrorBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFC2534C), width: 1.0),
-              ),
+            decoration: const InputDecoration(
               hintText: 'Enter your first name',
-              hintStyle: TextStyle(
-                color: Color(0xFFCFCFCF),
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
               labelText: 'Name',
-              labelStyle: TextStyle(
-                color: Color(0xFF696969),
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -181,41 +165,30 @@ class RegisterFormState extends State<RegisterForm> {
             textInputAction: TextInputAction.done,
             onChanged: (value) => _validateForm(),
           ),
-          SizedBox(height: 28),
+          const SizedBox(height: 28),
           TextFormField(
             controller: _emailController,
             style: TextStyle(
-              color: isEmailValid ? validInputColor : Color(0xFFC2534C),
+              color: _isEmailValid ? succeededColor : errorColor,
             ),
             textInputAction: TextInputAction.done,
             decoration: InputDecoration(
-              constraints: BoxConstraints(
-                minHeight: 68,
-              ),
-              floatingLabelBehavior: FloatingLabelBehavior.always,
-              contentPadding: EdgeInsets.fromLTRB(0, 12, 0, 12),
               hintText: 'Enter your e-mail',
-              hintStyle: TextStyle(
-                color: isEmailValid ? validInputColor : inputBorderColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
               labelText: 'E-mail',
-              labelStyle: TextStyle(
-                color: Color(0xFF696969),
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: focusedBorderColor, width: 1.0),
+                borderSide: BorderSide(
+                    color: _isEmailValid ? succeededColor : focusedColor,
+                    width: 1.0),
               ),
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: enabledBorderColor, width: 1.0),
+                borderSide: BorderSide(
+                    color: _isEmailValid ? succeededColor : enabledColor,
+                    width: 1.0),
               ),
-              suffixIcon: isEmailValid
-                  ? Icon(
+              suffixIcon: _isEmailValid
+                  ? const Icon(
                       Icons.check,
-                      color: validInputColor,
+                      color: succeededColor,
                     )
                   : null,
             ),
@@ -225,66 +198,44 @@ class RegisterFormState extends State<RegisterForm> {
             onChanged: (value) {
               _validateForm();
               setState(() {
-                isEmailValid = validateEmail(value) == null;
-                if (isEmailValid && value.isNotEmpty) {
-                  focusedBorderColor = validInputColor;
-                  enabledBorderColor = validInputColor;
-                } else if (!isEmailValid && value.isNotEmpty) {
-                  focusedBorderColor = errorBorderColor;
-                  enabledBorderColor = errorBorderColor;
-                } else {
-                  focusedBorderColor = inputTextColor;
-                  enabledBorderColor = inputBorderColor;
-                }
+                _isEmailValid = validateEmail(value) == null;
               });
             },
           ),
-          SizedBox(height: 28),
+          const SizedBox(height: 28),
           TextFormField(
             controller: _pass,
             style: TextStyle(
-              color: isPassValid ? validInputColor : Color(0xFFC2534C),
+              color: _isPassValid ? succeededColor : errorColor,
             ),
             obscureText: _isObscurePassword,
             textInputAction: TextInputAction.done,
             decoration: InputDecoration(
-              constraints: BoxConstraints(
-                minHeight: 68,
-              ),
-              floatingLabelBehavior: FloatingLabelBehavior.always,
-              contentPadding: EdgeInsets.fromLTRB(0, 12, 0, 12),
               hintText: 'Enter your password',
-              hintStyle: TextStyle(
-                color: Color(0xFFCFCFCF),
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
               labelText: 'Password',
-              labelStyle: TextStyle(
-                color: Color(0xFF696969),
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: focusedBorderColor, width: 1.0),
+                borderSide: BorderSide(
+                    color: _isPassValid ? succeededColor : focusedColor,
+                    width: 1.0),
               ),
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: enabledBorderColor, width: 1.0),
+                borderSide: BorderSide(
+                    color: _isPassValid ? succeededColor : enabledColor,
+                    width: 1.0),
               ),
-              suffixIcon: !isConfirmPassValid
+              suffixIcon: !_isPassValid
                   ? IconButton(
                       onPressed: _togglePasswordVisibility,
                       icon: Icon(
                         _isObscurePassword
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color:
-                            _isObscurePassword ? Colors.grey : Colors.black87,
+                        color: _isObscurePassword ? enabledColor : focusedColor,
                       ),
                     )
-                  : Icon(
+                  : const Icon(
                       Icons.check,
-                      color: validInputColor,
+                      color: succeededColor,
                     ),
             ),
             validator: validatePass,
@@ -292,53 +243,32 @@ class RegisterFormState extends State<RegisterForm> {
             onChanged: (value) {
               _validateForm();
               setState(() {
-                isPassValid = validatePass(value) == null;
-                if (isPassValid && value.isNotEmpty) {
-                  focusedBorderColor = validInputColor;
-                  enabledBorderColor = validInputColor;
-                } else if (!isPassValid && value.isNotEmpty) {
-                  focusedBorderColor = errorBorderColor;
-                  enabledBorderColor = errorBorderColor;
-                } else {
-                  focusedBorderColor = inputTextColor;
-                  enabledBorderColor = inputBorderColor;
-                }
+                _isPassValid = validatePass(value) == null;
               });
             },
           ),
-          SizedBox(height: 28),
+          const SizedBox(height: 28),
           TextFormField(
             style: TextStyle(
-              color: isConfirmPassValid ? validInputColor : Color(0xFFC2534C),
+              color: _isConfirmPassValid ? succeededColor : errorColor,
             ),
             controller: _confirmPass,
             obscureText: _isObscureConfirmPassword,
             textInputAction: TextInputAction.done,
             decoration: InputDecoration(
-              constraints: BoxConstraints(
-                minHeight: 68,
-              ),
-              floatingLabelBehavior: FloatingLabelBehavior.always,
-              contentPadding: EdgeInsets.fromLTRB(0, 12, 0, 12),
               hintText: 'Enter your password again',
-              hintStyle: TextStyle(
-                color: isConfirmPassValid ? validInputColor : inputBorderColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
               labelText: 'Confirm password',
-              labelStyle: TextStyle(
-                color: Color(0xFF696969),
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: focusedBorderColor, width: 1.0),
+                borderSide: BorderSide(
+                    color: _isConfirmPassValid ? succeededColor : focusedColor,
+                    width: 1.0),
               ),
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: enabledBorderColor, width: 1.0),
+                borderSide: BorderSide(
+                    color: _isConfirmPassValid ? succeededColor : enabledColor,
+                    width: 1.0),
               ),
-              suffixIcon: !isConfirmPassValid
+              suffixIcon: !_isConfirmPassValid
                   ? IconButton(
                       onPressed: _toggleConfirmPasswordVisibility,
                       icon: Icon(
@@ -346,13 +276,13 @@ class RegisterFormState extends State<RegisterForm> {
                             ? Icons.visibility_off
                             : Icons.visibility,
                         color: _isObscureConfirmPassword
-                            ? Colors.grey
-                            : Colors.black87,
+                            ? enabledColor
+                            : focusedColor,
                       ),
                     )
-                  : Icon(
+                  : const Icon(
                       Icons.check,
-                      color: validInputColor,
+                      color: succeededColor,
                     ),
             ),
             validator: validateConfirmPass,
@@ -360,77 +290,43 @@ class RegisterFormState extends State<RegisterForm> {
             onChanged: (value) {
               _validateForm();
               setState(() {
-                isConfirmPassValid = validateConfirmPass(value) == null;
-                if (isConfirmPassValid && value.isNotEmpty) {
-                  focusedBorderColor = validInputColor;
-                  enabledBorderColor = validInputColor;
-                } else if (!isConfirmPassValid && value.isNotEmpty) {
-                  focusedBorderColor = errorBorderColor;
-                  enabledBorderColor = errorBorderColor;
-                } else {
-                  focusedBorderColor = inputTextColor;
-                  enabledBorderColor = inputBorderColor;
-                }
+                _isConfirmPassValid = validateConfirmPass(value) == null;
               });
             },
           ),
-          SizedBox(height: 42),
-          ElevatedButton(
-            onPressed: _isFormValid
-                ? () {
-                    _registerUser();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => RegistrationSuccessScreen()),
-                    );
-                  }
-                : null,
-            style: ButtonStyle(
-              padding: MaterialStateProperty.all(
-                  EdgeInsets.fromLTRB(12, 16, 12, 16)),
-              minimumSize: MaterialStateProperty.all(Size(375, 54)),
-              shape: MaterialStateProperty.all(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-              ),
-              backgroundColor:
-                  MaterialStateProperty.resolveWith<Color>((states) {
-                if (states.contains(MaterialState.disabled)) {
-                  return const Color(0xFFEBEBEB);
-                }
-                return const Color(0xFF2A2A2A);
-              }),
-            ),
-            child: PrimaryButtonText(text: 'Register'),
+          const SizedBox(height: 42),
+          PrimaryButton(
+            onPressed: () => _onPressed(),
+            btnText: 'Register',
+            isValid: _isFormValid,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 'Already have an account?',
                 style: TextStyle(
                   fontFamily: 'Outfit',
                   fontWeight: FontWeight.w400,
                   fontSize: 16,
-                  color: Color(0xFF696969),
+                  color: secondatyTextColor,
                 ),
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LogInMainPage()),
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const LogInMainPage(),
+                    ),
                   );
                 },
-                child: Text(
+                child: const Text(
                   'Log in',
                   style: TextStyle(
                     fontFamily: 'Outfit',
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
-                    color: Color(0xFFDE6352),
+                    color: hightLightColor,
                   ),
                 ),
               ),

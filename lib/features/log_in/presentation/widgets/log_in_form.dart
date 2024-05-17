@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todolist/features/registration/presentation/pages/registration_main_page.dart';
+import 'package:flutter_todolist/features/user_desks/presentation/pages/main_dashboard_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../presentation/ui/primary_botton/primary_button_text.dart';
-import '../../../registration/presentation/pages/registration_main_page.dart';
+import '../../../../presentation/ui/bottons/primary_button.dart';
 import 'dart:convert';
-import '../../../user_desks/presentation/pages/user_dashboard_all_desks.dart';
-
-export 'log_in_form.dart';
 
 class LogInForm extends StatefulWidget {
   const LogInForm({super.key});
@@ -18,39 +16,34 @@ class LogInFormState extends State<LogInForm> {
   final _formKey = GlobalKey<LogInFormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _isFormValid = false;
-  bool isEmailValid = false;
-  bool userFound = false;
-  bool emailUserFound = false;
-  bool passwordUserFound = false;
-  bool isPassValid = false;
 
-  Color inputTextColor = Color(0xFF2A2A2A);
-  Color validInputColor = Color(0xFF39C622);
-  Color inputBorderColor = Color(0xFFCFCFCF);
-  Color obscureIconColor = Color(0xFF2A2A2A);
-  Color focusedBorderColor = Color(0xFF2A2A2A);
-  Color enabledBorderColor = Color(0xFFCFCFCF);
-  Color errorBorderColor = Color(0xFFC2534C);
+  bool _isFormValid = false;
+  bool _isEmailValid = false;
+  bool _userFound = false;
+  bool _emailUserFound = false;
+  bool _passwordUserFound = false;
+  bool _isPassValid = false;
+
+  static const Color errorColor = Color(0xFFC2534C);
+  static const Color hightLightColor = Color(0xFFDE6352);
+  static const Color enabledColor = Color(0xFFCFCFCF);
+  static const Color focusedColor = Color(0xFF2A2A2A);
+  static const Color succeededColor = Color(0xFF39C622);
+  static const Color secondatyTextColor = Color(0xFF696969);
+  static const Color enabledBtnColor = Color(0xFFEBEBEB);
 
   void _validateForm() {
-    if (userFound) {
-      setState(() {
-        _isFormValid = true;
-      });
+    if (_userFound) {
+      _isFormValid = true;
     } else {
-      setState(() {
-        _isFormValid = false;
-      });
+      _isFormValid = false;
     }
   }
 
   bool _isObscurePassword = true;
 
   void _togglePasswordVisibility() {
-    setState(() {
-      _isObscurePassword = !_isObscurePassword;
-    });
+    _isObscurePassword = !_isObscurePassword;
   }
 
   void _loginUser() async {
@@ -60,9 +53,9 @@ class LogInFormState extends State<LogInForm> {
     String userEmail = _emailController.text;
     String userPassword = _passwordController.text;
 
-    emailUserFound = false;
-    passwordUserFound = false;
-    userFound = false;
+    _emailUserFound = false;
+    _passwordUserFound = false;
+    _userFound = false;
     Map<String, dynamic> currentUser = {};
 
     List<String> usersJsonList = prefs.getStringList('users') ?? [];
@@ -70,19 +63,19 @@ class LogInFormState extends State<LogInForm> {
         usersJsonList.map((userJson) => json.decode(userJson)).toList();
     for (var user in users) {
       if (user['userEmail'] == userEmail) {
-        emailUserFound = true;
+        _emailUserFound = true;
       }
       if (user['userPassword'] == userPassword) {
-        passwordUserFound = true;
+        _passwordUserFound = true;
         currentUser = user;
       }
-      if (passwordUserFound && emailUserFound) {
-        userFound = true;
+      if (_passwordUserFound && _emailUserFound) {
+        _userFound = true;
         break;
       }
     }
 
-    if (userFound) {
+    if (_userFound) {
       prefs.setString('currentUser', json.encode(currentUser));
     }
 
@@ -91,33 +84,34 @@ class LogInFormState extends State<LogInForm> {
     });
   }
 
+  String? validateEmail(String? value) {
+    _loginUser();
+    if (!_emailUserFound) {
+      _isEmailValid = false;
+      return 'E-mail not found';
+    } else if (_emailUserFound) {
+      _isEmailValid = true;
+    }
+    return null;
+  }
+
+  String? validatePassword(String? value) {
+    _loginUser();
+    if (!_userFound) {
+      _isPassValid = false;
+      return 'User not found';
+    } else if (!_passwordUserFound) {
+      _isPassValid = false;
+      return 'Wrong password';
+    } else if (_passwordUserFound) {
+      _isPassValid = true;
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    String? validateEmail(String? value) {
-      _loginUser();
-      if (!emailUserFound) {
-        isEmailValid = false;
-        return 'E-mail not found';
-      } else if (emailUserFound) {
-        isEmailValid = true;
-      }
-      return null;
-    }
-
-    String? validatePassword(String? value) {
-      _loginUser();
-      if (!userFound) {
-        isPassValid = false;
-        return 'User not found';
-      } else if (!passwordUserFound) {
-        isPassValid = false;
-        return 'Wrong password';
-      } else if (passwordUserFound) {
-        isPassValid = true;
-      }
-      return null;
-    }
-
+    final double screenHeight = MediaQuery.of(context).size.height;
     return Form(
       key: _formKey,
       child: Column(
@@ -126,166 +120,110 @@ class LogInFormState extends State<LogInForm> {
           TextFormField(
             controller: _emailController,
             style: TextStyle(
-              color: isEmailValid ? validInputColor : Color(0xFFC2534C),
+              color: _isEmailValid ? succeededColor : errorColor,
             ),
             textInputAction: TextInputAction.done,
             decoration: InputDecoration(
-              constraints: BoxConstraints(
-                minHeight: 68,
-              ),
-              floatingLabelBehavior: FloatingLabelBehavior.always,
-              contentPadding: EdgeInsets.fromLTRB(0, 12, 0, 12),
               hintText: 'Enter your e-mail',
-              hintStyle: TextStyle(
-                color: isEmailValid ? validInputColor : inputBorderColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
               labelText: 'E-mail',
-              labelStyle: TextStyle(
-                color: Color(0xFF696969),
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: focusedBorderColor, width: 1.0),
+                borderSide: BorderSide(
+                    color: _isEmailValid ? succeededColor : focusedColor,
+                    width: 1.0),
               ),
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: enabledBorderColor, width: 1.0),
+                borderSide: BorderSide(
+                    color: _isEmailValid ? succeededColor : enabledColor,
+                    width: 1.0),
               ),
-              border: UnderlineInputBorder(
-                  borderSide: BorderSide(color: validInputColor, width: 1.0)),
-              errorBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: errorBorderColor, width: 1.0)),
-              suffixIcon: isEmailValid
-                  ? Icon(
+              errorBorder: Theme.of(context).inputDecorationTheme.errorBorder,
+              suffixIcon: _isEmailValid
+                  ? const Icon(
                       Icons.check,
-                      color: validInputColor,
+                      color: succeededColor,
                     )
                   : null,
             ),
             autovalidateMode: AutovalidateMode.onUserInteraction,
             keyboardType: TextInputType.emailAddress,
             validator: validateEmail,
-            onChanged: (value) {
-              validateEmail(value);
-            },
           ),
-          SizedBox(height: 28),
+          SizedBox(height: screenHeight * 0.05),
           TextFormField(
             style: TextStyle(
-              color: isPassValid ? validInputColor : Color(0xFFC2534C),
+              color: _isPassValid ? succeededColor : errorColor,
             ),
             controller: _passwordController,
             obscureText: _isObscurePassword,
             textInputAction: TextInputAction.done,
             decoration: InputDecoration(
-              constraints: BoxConstraints(
-                minHeight: 68,
-              ),
-              floatingLabelBehavior: FloatingLabelBehavior.always,
-              contentPadding: EdgeInsets.fromLTRB(0, 12, 0, 12),
               hintText: 'Enter your password',
-              hintStyle: TextStyle(
-                color: Color(0xFFCFCFCF),
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-              ),
               labelText: 'Password',
-              labelStyle: TextStyle(
-                color: Color(0xFF696969),
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: focusedBorderColor, width: 1.0),
+                borderSide: BorderSide(
+                    color: _isPassValid ? succeededColor : focusedColor,
+                    width: 1.0),
               ),
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: enabledBorderColor, width: 1.0),
+                borderSide: BorderSide(
+                    color: _isPassValid ? succeededColor : enabledColor,
+                    width: 1.0),
               ),
-              border: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF39C622), width: 1.0)),
-              errorBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: errorBorderColor, width: 1.0)),
-              suffixIcon: !isPassValid
+              suffixIcon: !_isPassValid
                   ? IconButton(
                       onPressed: _togglePasswordVisibility,
                       icon: Icon(
                         _isObscurePassword
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color:
-                            _isObscurePassword ? Colors.grey : Colors.black87,
+                        color: _isObscurePassword ? enabledColor : focusedColor,
                       ),
                     )
-                  : Icon(
+                  : const Icon(
                       Icons.check,
-                      color: validInputColor,
+                      color: succeededColor,
                     ),
             ),
             validator: validatePassword,
             autovalidateMode: AutovalidateMode.onUserInteraction,
-            onChanged: (value) {
-              validatePassword(value);
-            },
           ),
-          SizedBox(height: 42),
-          ElevatedButton(
-            onPressed: _isFormValid
-                ? () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => UserDashboardAllDesksPage()),
-                    );
-                  }
-                : null,
-            style: ButtonStyle(
-              padding: MaterialStateProperty.all(
-                  EdgeInsets.fromLTRB(12, 16, 12, 16)),
-              minimumSize: MaterialStateProperty.all(Size(375, 54)),
-              shape: MaterialStateProperty.all(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
+          SizedBox(height: screenHeight * 0.06),
+          PrimaryButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const UserDashboardPage(),
                 ),
-              ),
-              backgroundColor:
-                  MaterialStateProperty.resolveWith<Color>((states) {
-                if (states.contains(MaterialState.disabled)) {
-                  return const Color(0xFFEBEBEB);
-                }
-                return const Color(0xFF2A2A2A);
-              }),
-            ),
-            child: PrimaryButtonText(text: 'Confirm'),
+              );
+            },
+            btnText: 'Confirm',
+            isValid: _isFormValid,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 'Don’t have an account?',
                 style: TextStyle(
-                  fontFamily: 'Outfit',
                   fontWeight: FontWeight.w400,
                   fontSize: 16,
-                  color: Color(0xFF696969),
+                  color: secondatyTextColor,
                 ),
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
+                  Navigator.of(context).push(
                     MaterialPageRoute(
-                        builder: (context) => RegistrationMainPage()),
+                      builder: (context) => const RegistrationMainPage(),
+                    ),
                   );
                 },
-                child: Text(
+                child: const Text(
                   'Sign up',
                   style: TextStyle(
-                    fontFamily: 'Outfit',
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
-                    color: Color(0xFFDE6352),
+                    color: hightLightColor,
                   ),
                 ),
               ),
